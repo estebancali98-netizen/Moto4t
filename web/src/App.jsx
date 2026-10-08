@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { 
   Wrench, 
@@ -70,6 +70,78 @@ export default function App() {
     }
   };
 
+  const seedInitialOrders = async () => {
+    try {
+      const sampleOrders = [
+        {
+          id: 'ord_1',
+          plate: 'ABC-12D',
+          motorcycleSummary: 'AKT AK125 NKD (2023)',
+          clientName: 'Carlos Andrés Gómez',
+          clientPhone: '3124567890',
+          reportedIssue: 'Mantenimiento preventivo 15,000km, cambio de aceite y kit de arrastre',
+          status: 'RECEIVED',
+          assignedMechanicName: 'Carlos Mecánico',
+          initialMileage: 18500,
+          fuelLevel: 'HALF',
+          totalApprovedQuote: 125000,
+          advancePayment: 50000,
+          paidAmount: 50000,
+          balanceDue: 75000,
+          minutesWorked: 0,
+          entryTimestamp: Date.now() - 3600000,
+          userId: 'demo_user'
+        },
+        {
+          id: 'ord_2',
+          plate: 'XYZ-89E',
+          motorcycleSummary: 'Yamaha NMAX 155 (2024)',
+          clientName: 'Mariana Valencia',
+          clientPhone: '3159876543',
+          reportedIssue: 'Revisión de pastillas de freno delanteras y ruido en variador',
+          status: 'DIAGNOSIS',
+          assignedMechanicName: 'Mateo Especialista',
+          initialMileage: 8200,
+          fuelLevel: 'FULL',
+          totalApprovedQuote: 180000,
+          advancePayment: 80000,
+          paidAmount: 80000,
+          balanceDue: 100000,
+          minutesWorked: 25,
+          entryTimestamp: Date.now() - 7200000,
+          userId: 'demo_user'
+        },
+        {
+          id: 'ord_3',
+          plate: 'KJH-45F',
+          motorcycleSummary: 'Suzuki GN 125 (2022)',
+          clientName: 'Sebastián Roa',
+          clientPhone: '3201234567',
+          reportedIssue: 'Sincronización de carburador y cambio de bujía NGK',
+          status: 'READY',
+          assignedMechanicName: 'Carlos Mecánico',
+          initialMileage: 34200,
+          fuelLevel: 'QUARTER',
+          totalApprovedQuote: 95000,
+          advancePayment: 95000,
+          paidAmount: 95000,
+          balanceDue: 0,
+          minutesWorked: 65,
+          entryTimestamp: Date.now() - 14400000,
+          userId: 'demo_user'
+        }
+      ];
+
+      for (const order of sampleOrders) {
+        await setDoc(doc(db, 'work_orders', order.id), order);
+      }
+      alert('¡Órdenes de prueba sincronizadas con éxito en Firestore!');
+    } catch (e) {
+      console.error("Error seeding orders:", e);
+      alert('Error: ' + e.message);
+    }
+  };
+
   const filteredOrders = orders.filter(o => 
     (o.plate || '').toLowerCase().includes(search.toLowerCase()) ||
     (o.clientName || '').toLowerCase().includes(search.toLowerCase()) ||
@@ -118,6 +190,14 @@ export default function App() {
               className="bg-transparent border-none outline-none text-slate-100 text-xs sm:text-sm w-full placeholder:text-slate-500"
             />
           </div>
+          {orders.length === 0 && (
+            <button 
+              onClick={seedInitialOrders}
+              className="bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow transition-all animate-bounce whitespace-nowrap"
+            >
+              <RefreshCw size={13} /> Cargar Órdenes Ejemplo
+            </button>
+          )}
           <div className="hidden sm:flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-full whitespace-nowrap">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>Firestore en Vivo</span>
