@@ -16,7 +16,9 @@ import {
   User, 
   Phone,
   Layers,
-  ChevronRight
+  ChevronRight,
+  Menu,
+  X
 } from 'lucide-react';
 
 const KANBAN_COLUMNS = [
@@ -33,6 +35,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [activeTabStatus, setActiveTabStatus] = useState('ALL'); // Para vista móvil de columnas
 
   useEffect(() => {
     try {
@@ -78,401 +81,344 @@ export default function App() {
   const readyCount = orders.filter(o => o.status === 'READY').length;
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#0b1120' }}>
-      {/* Top Header */}
-      <header style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
-        padding: '16px 28px', 
-        backgroundColor: '#0f172a', 
-        borderBottom: '1px solid #1e293b' 
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ 
-            width: '42px', 
-            height: '42px', 
-            borderRadius: '12px', 
-            backgroundColor: '#ea580c', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            color: '#fff' 
-          }}>
-            <Bike size={24} />
+    <div className="min-h-screen flex flex-col bg-[#0b1120] text-slate-100">
+      {/* Top Header - Mobile friendly wrap */}
+      <header className="bg-[#0f172a] border-b border-slate-800 px-4 py-3 sm:px-7 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center text-white shrink-0 shadow-md">
+            <Bike size={22} />
           </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '20px', fontWeight: '800', color: '#f8fafc', letterSpacing: '-0.5px' }}>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-lg sm:text-xl font-extrabold text-slate-50 tracking-tight">
                 MotoTaller
               </span>
-              <span style={{ 
-                backgroundColor: '#ea580c', 
-                color: '#fff', 
-                fontSize: '11px', 
-                fontWeight: '900', 
-                padding: '2px 6px', 
-                borderRadius: '4px' 
-              }}>
+              <span className="bg-orange-600 text-white text-[10px] sm:text-xs font-black px-1.5 py-0.5 rounded">
                 PRO
               </span>
-              <span style={{ 
-                backgroundColor: '#0284c720', 
-                color: '#38bdf8', 
-                border: '1px solid #0284c740',
-                fontSize: '11px', 
-                fontWeight: '600', 
-                padding: '2px 8px', 
-                borderRadius: '20px' 
-              }}>
-                Vercel Web Reception
+              <span className="bg-sky-500/10 text-sky-400 border border-sky-500/30 text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full">
+                Móvil & Web
               </span>
             </div>
-            <p style={{ fontSize: '13px', color: '#94a3b8' }}>
-              Mostrador de Recepción sincronizado con App Móvil Android (Firebase Firestore)
+            <p className="text-xs text-slate-400">
+              Sincronizado en tiempo real con Android & Firestore
             </p>
           </div>
         </div>
 
-        {/* Search */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ 
-            position: 'relative', 
-            display: 'flex', 
-            alignItems: 'center', 
-            backgroundColor: '#1e293b', 
-            borderRadius: '10px', 
-            padding: '8px 14px',
-            border: '1px solid #334155'
-          }}>
-            <Search size={18} color="#94a3b8" style={{ marginRight: '8px' }} />
+        {/* Search & Cloud Status */}
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="relative flex items-center bg-slate-800/90 rounded-lg px-3 py-2 border border-slate-700 flex-1 sm:w-64">
+            <Search size={16} className="text-slate-400 mr-2 shrink-0" />
             <input 
               type="text" 
               placeholder="Buscar placa, cliente..." 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{ 
-                background: 'transparent', 
-                border: 'none', 
-                outline: 'none', 
-                color: '#f8fafc', 
-                fontSize: '14px',
-                width: '240px' 
-              }}
+              className="bg-transparent border-none outline-none text-slate-100 text-xs sm:text-sm w-full placeholder:text-slate-500"
             />
           </div>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '8px', 
-            fontSize: '12px', 
-            color: '#22c55e', 
-            backgroundColor: '#15803d20',
-            border: '1px solid #22c55e40',
-            padding: '6px 12px',
-            borderRadius: '20px'
-          }}>
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }} />
-            Firestore en Vivo
+          <div className="hidden sm:flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-full whitespace-nowrap">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Firestore en Vivo</span>
           </div>
         </div>
       </header>
 
-      {/* KPI Bar */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
-        gap: '16px', 
-        padding: '20px 28px',
-        backgroundColor: '#0b1120'
-      }}>
-        <div style={{ backgroundColor: '#0f172a', padding: '16px', borderRadius: '12px', border: '1px solid #1e293b' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', fontSize: '13px' }}>
-            <span>Órdenes Activas</span>
-            <Wrench size={18} color="#ea580c" />
+      {/* KPI Bar - Mobile grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4 p-3 sm:px-7 sm:py-4 bg-[#0b1120]">
+        <div className="bg-[#0f172a] p-3 sm:p-4 rounded-xl border border-slate-800">
+          <div className="flex justify-between text-slate-400 text-xs">
+            <span>En Patio</span>
+            <Wrench size={16} className="text-orange-500" />
           </div>
-          <div style={{ fontSize: '26px', fontWeight: '800', color: '#f8fafc', marginTop: '6px' }}>
+          <div className="text-xl sm:text-2xl font-black text-slate-50 mt-1">
             {activeCount}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#0f172a', padding: '16px', borderRadius: '12px', border: '1px solid #1e293b' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', fontSize: '13px' }}>
-            <span>Listas para Entrega</span>
-            <CheckCircle2 size={18} color="#22c55e" />
+        <div className="bg-[#0f172a] p-3 sm:p-4 rounded-xl border border-slate-800">
+          <div className="flex justify-between text-slate-400 text-xs">
+            <span>Listas Entrega</span>
+            <CheckCircle2 size={16} className="text-emerald-400" />
           </div>
-          <div style={{ fontSize: '26px', fontWeight: '800', color: '#22c55e', marginTop: '6px' }}>
+          <div className="text-xl sm:text-2xl font-black text-emerald-400 mt-1">
             {readyCount}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#0f172a', padding: '16px', borderRadius: '12px', border: '1px solid #1e293b' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', fontSize: '13px' }}>
+        <div className="col-span-2 sm:col-span-1 bg-[#0f172a] p-3 sm:p-4 rounded-xl border border-slate-800">
+          <div className="flex justify-between text-slate-400 text-xs">
             <span>Recaudado Total</span>
-            <DollarSign size={18} color="#38bdf8" />
+            <DollarSign size={16} className="text-sky-400" />
           </div>
-          <div style={{ fontSize: '26px', fontWeight: '800', color: '#38bdf8', marginTop: '6px' }}>
+          <div className="text-xl sm:text-2xl font-black text-sky-400 mt-1">
             ${totalRevenue.toLocaleString('es-CO')}
           </div>
         </div>
       </div>
 
-      {/* Kanban Board */}
-      <div style={{ 
-        flex: 1, 
-        padding: '0 28px 28px', 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(6, minmax(260px, 1fr))', 
-        gap: '16px', 
-        overflowX: 'auto' 
-      }}>
-        {KANBAN_COLUMNS.map(column => {
-          const colOrders = filteredOrders.filter(o => (o.status || 'RECEIVED') === column.id);
+      {/* Mobile Kanban Tab Selector (Horizontal scroll for small screens) */}
+      <div className="px-3 sm:px-7 mb-2 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none sm:hidden">
+        <button
+          onClick={() => setActiveTabStatus('ALL')}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+            activeTabStatus === 'ALL'
+              ? 'bg-orange-600 text-white shadow-sm'
+              : 'bg-slate-800 text-slate-300 border border-slate-700'
+          }`}
+        >
+          Todas ({filteredOrders.length})
+        </button>
+        {KANBAN_COLUMNS.map(col => {
+          const count = filteredOrders.filter(o => (o.status || 'RECEIVED') === col.id).length;
           return (
-            <div 
-              key={column.id} 
-              style={{ 
-                backgroundColor: '#0f172a', 
-                borderRadius: '14px', 
-                border: '1px solid #1e293b', 
-                display: 'flex', 
-                flexDirection: 'column',
-                height: 'calc(100vh - 230px)' 
-              }}
+            <button
+              key={col.id}
+              onClick={() => setActiveTabStatus(col.id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors ${
+                activeTabStatus === col.id
+                  ? 'bg-orange-600 text-white shadow-sm'
+                  : 'bg-slate-800 text-slate-300 border border-slate-700'
+              }`}
             >
-              {/* Column Header */}
-              <div style={{ 
-                padding: '14px 16px', 
-                borderBottom: '1px solid #1e293b', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between' 
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: column.color }} />
-                  <span style={{ fontSize: '14px', fontWeight: '700', color: '#f8fafc' }}>
-                    {column.label}
-                  </span>
-                </div>
-                <span style={{ 
-                  backgroundColor: '#1e293b', 
-                  color: '#94a3b8', 
-                  fontSize: '12px', 
-                  fontWeight: '700', 
-                  padding: '2px 8px', 
-                  borderRadius: '12px' 
-                }}>
-                  {colOrders.length}
-                </span>
-              </div>
-
-              {/* Cards Container */}
-              <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {colOrders.map(order => (
-                  <div 
-                    key={order.id}
-                    onClick={() => setSelectedOrder(order)}
-                    style={{ 
-                      backgroundColor: '#1e293b', 
-                      borderRadius: '10px', 
-                      padding: '14px', 
-                      border: '1px solid #334155',
-                      cursor: 'pointer',
-                      transition: 'transform 0.15s, border-color 0.15s'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.borderColor = column.color}
-                    onMouseLeave={(e) => e.currentTarget.style.borderColor = '#334155'}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span style={{ 
-                        backgroundColor: '#ea580c20', 
-                        color: '#f97316', 
-                        fontWeight: '800', 
-                        fontSize: '13px', 
-                        padding: '2px 8px', 
-                        borderRadius: '6px' 
-                      }}>
-                        {order.plate || 'SIN PLACA'}
-                      </span>
-                      <span style={{ fontSize: '11px', color: '#94a3b8' }}>
-                        #{order.id}
-                      </span>
-                    </div>
-
-                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#f8fafc', marginBottom: '4px' }}>
-                      {order.motorcycleSummary || 'Motocicleta'}
-                    </div>
-
-                    <div style={{ fontSize: '12px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                      <User size={13} />
-                      {order.clientName || 'Cliente'}
-                    </div>
-
-                    <div style={{ 
-                      fontSize: '12px', 
-                      color: '#cbd5e1', 
-                      backgroundColor: '#0f172a', 
-                      padding: '8px', 
-                      borderRadius: '6px', 
-                      marginBottom: '10px',
-                      fontStyle: 'italic'
-                    }}>
-                      "{order.reportedIssue || 'Mantenimiento preventivo general'}"
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid #334155' }}>
-                      <span style={{ fontSize: '12px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Wrench size={13} color="#ea580c" />
-                        {order.assignedMechanicName || 'Sin asignar'}
-                      </span>
-
-                      {column.id !== 'DELIVERED' && (
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAdvanceStatus(order.id, column.id);
-                          }}
-                          style={{ 
-                            background: '#ea580c', 
-                            color: '#fff', 
-                            border: 'none', 
-                            borderRadius: '6px', 
-                            padding: '4px 8px', 
-                            fontSize: '11px', 
-                            fontWeight: '700', 
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '2px'
-                          }}
-                        >
-                          Avanzar <ChevronRight size={12} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: col.color }} />
+              {col.label} ({count})
+            </button>
           );
         })}
       </div>
 
-      {/* Order Detail Modal */}
+      {/* Kanban Board Container: Responsive Multi-Column on desktop, filtered cards or side-scroller on mobile */}
+      <div className="flex-1 px-3 sm:px-7 pb-6 overflow-x-auto">
+        <div className="hidden sm:grid sm:grid-cols-6 gap-3.5 min-w-[1200px]">
+          {KANBAN_COLUMNS.map(column => {
+            const colOrders = filteredOrders.filter(o => (o.status || 'RECEIVED') === column.id);
+            return (
+              <div 
+                key={column.id} 
+                className="bg-[#0f172a] rounded-xl border border-slate-800 flex flex-col h-[calc(100vh-220px)]"
+              >
+                {/* Column Header */}
+                <div className="p-3 border-b border-slate-800 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: column.color }} />
+                    <span className="text-xs font-bold text-slate-100">
+                      {column.label}
+                    </span>
+                  </div>
+                  <span className="bg-slate-800 text-slate-400 text-[11px] font-bold px-2 py-0.5 rounded-full">
+                    {colOrders.length}
+                  </span>
+                </div>
+
+                {/* Cards Container */}
+                <div className="flex-1 overflow-y-auto p-2.5 flex flex-col gap-2.5">
+                  {colOrders.map(order => (
+                    <div 
+                      key={order.id}
+                      onClick={() => setSelectedOrder(order)}
+                      className="bg-slate-800/90 hover:border-orange-500 rounded-lg p-3 border border-slate-700/80 cursor-pointer transition-all shadow-sm"
+                    >
+                      <div className="flex justify-between items-center mb-1.5">
+                        <span className="bg-orange-500/20 text-orange-400 font-extrabold text-xs px-2 py-0.5 rounded">
+                          {order.plate || 'SIN PLACA'}
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          #{order.id}
+                        </span>
+                      </div>
+
+                      <div className="text-xs font-bold text-slate-100 mb-1 line-clamp-1">
+                        {order.motorcycleSummary || 'Motocicleta'}
+                      </div>
+
+                      <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mb-1.5">
+                        <User size={12} />
+                        <span className="truncate">{order.clientName || 'Cliente'}</span>
+                      </div>
+
+                      <div className="text-[11px] text-slate-300 bg-slate-900/80 p-2 rounded mb-2 italic line-clamp-2">
+                        "{order.reportedIssue || 'Revisión general'}"
+                      </div>
+
+                      <div className="flex justify-between items-center pt-2 border-t border-slate-700/60">
+                        <span className="text-[11px] text-slate-400 flex items-center gap-1 truncate max-w-[100px]">
+                          <Wrench size={12} className="text-orange-500 shrink-0" />
+                          <span className="truncate">{order.assignedMechanicName || 'Sin asignar'}</span>
+                        </span>
+
+                        {column.id !== 'DELIVERED' && (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAdvanceStatus(order.id, column.id);
+                            }}
+                            className="bg-orange-600 hover:bg-orange-500 text-white rounded px-2 py-1 text-[10px] font-bold flex items-center gap-1 transition-colors"
+                          >
+                            Avanzar <ChevronRight size={11} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Mobile View: Vertical list filtered by selected status pill */}
+        <div className="sm:hidden flex flex-col gap-2.5">
+          {(() => {
+            const currentOrders = activeTabStatus === 'ALL'
+              ? filteredOrders
+              : filteredOrders.filter(o => (o.status || 'RECEIVED') === activeTabStatus);
+
+            if (currentOrders.length === 0) {
+              return (
+                <div className="bg-[#0f172a] rounded-xl border border-slate-800 p-8 text-center text-slate-400">
+                  <Bike size={36} className="mx-auto text-slate-600 mb-2" />
+                  <p className="text-xs">No hay órdenes en este estado</p>
+                </div>
+              );
+            }
+
+            return currentOrders.map(order => {
+              const col = KANBAN_COLUMNS.find(c => c.id === (order.status || 'RECEIVED')) || KANBAN_COLUMNS[0];
+              return (
+                <div 
+                  key={order.id}
+                  onClick={() => setSelectedOrder(order)}
+                  className="bg-[#0f172a] rounded-xl p-3.5 border border-slate-800 active:scale-[0.99] transition-transform"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="bg-orange-500/20 text-orange-400 font-extrabold text-xs px-2.5 py-0.5 rounded">
+                        {order.plate || 'SIN PLACA'}
+                      </span>
+                      <span 
+                        className="text-[10px] font-bold px-2 py-0.5 rounded-full" 
+                        style={{ backgroundColor: `${col.color}25`, color: col.color }}
+                      >
+                        {col.label}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-slate-500 font-mono">
+                      #{order.id}
+                    </span>
+                  </div>
+
+                  <div className="text-sm font-bold text-slate-100 mb-1">
+                    {order.motorcycleSummary || 'Motocicleta'}
+                  </div>
+
+                  <div className="flex items-center gap-3 text-xs text-slate-400 mb-2">
+                    <span className="flex items-center gap-1 truncate">
+                      <User size={13} /> {order.clientName || 'Cliente'}
+                    </span>
+                    {order.clientPhone && (
+                      <span className="flex items-center gap-1 text-sky-400">
+                        <Phone size={12} /> {order.clientPhone}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="text-xs text-slate-300 bg-slate-900/90 p-2.5 rounded-lg mb-2.5 italic">
+                    "{order.reportedIssue || 'Revisión general y diagnóstico'}"
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
+                    <span className="text-slate-400 flex items-center gap-1">
+                      <Wrench size={13} className="text-orange-500" />
+                      {order.assignedMechanicName || 'Mecánico asignado'}
+                    </span>
+
+                    {order.status !== 'DELIVERED' && (
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAdvanceStatus(order.id, order.status || 'RECEIVED');
+                        }}
+                        className="bg-orange-600 active:bg-orange-700 text-white rounded-lg px-3 py-1.5 text-xs font-bold flex items-center gap-1 shadow"
+                      >
+                        Avanzar <ChevronRight size={13} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            });
+          })()}
+        </div>
+      </div>
+
+      {/* Order Detail Modal - Mobile responsive drawer/dialog */}
       {selectedOrder && (
-        <div style={{ 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          right: 0, 
-          bottom: 0, 
-          backgroundColor: '#000000bb', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          zIndex: 50,
-          padding: '20px'
-        }}>
-          <div style={{ 
-            backgroundColor: '#0f172a', 
-            borderRadius: '16px', 
-            border: '1px solid #334155', 
-            width: '100%', 
-            maxWidth: '620px', 
-            maxHeight: '90vh', 
-            overflowY: 'auto', 
-            padding: '24px' 
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-3 sm:p-5">
+          <div className="bg-[#0f172a] rounded-2xl border border-slate-700 w-full max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6 shadow-2xl">
+            <div className="flex justify-between items-start mb-4">
               <div>
-                <span style={{ 
-                  backgroundColor: '#ea580c20', 
-                  color: '#f97316', 
-                  fontWeight: '800', 
-                  fontSize: '14px', 
-                  padding: '4px 10px', 
-                  borderRadius: '6px' 
-                }}>
+                <span className="bg-orange-500/20 text-orange-400 font-extrabold text-sm px-2.5 py-1 rounded">
                   {selectedOrder.plate}
                 </span>
-                <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#f8fafc', marginTop: '8px' }}>
+                <h2 className="text-base sm:text-lg font-black text-slate-50 mt-2">
                   {selectedOrder.motorcycleSummary}
                 </h2>
-                <p style={{ fontSize: '13px', color: '#94a3b8' }}>
+                <p className="text-xs text-slate-400">
                   Orden #{selectedOrder.id} • Estado: {selectedOrder.status}
                 </p>
               </div>
               <button 
                 onClick={() => setSelectedOrder(null)}
-                style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '20px', cursor: 'pointer' }}
+                className="text-slate-400 hover:text-white p-1 rounded-full text-lg"
               >
                 ✕
               </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ backgroundColor: '#1e293b', padding: '12px', borderRadius: '10px' }}>
-                <span style={{ fontSize: '12px', color: '#94a3b8' }}>Propietario / Cliente</span>
-                <p style={{ fontSize: '14px', fontWeight: '700', color: '#f8fafc', marginTop: '2px' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
+              <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700/60">
+                <span className="text-[11px] text-slate-400">Cliente / Propietario</span>
+                <p className="text-xs sm:text-sm font-bold text-slate-100 mt-0.5">
                   {selectedOrder.clientName}
                 </p>
-                <p style={{ fontSize: '12px', color: '#38bdf8', marginTop: '2px' }}>
+                <p className="text-xs text-sky-400 mt-0.5">
                   📞 {selectedOrder.clientPhone || 'Sin teléfono'}
                 </p>
               </div>
 
-              <div style={{ backgroundColor: '#1e293b', padding: '12px', borderRadius: '10px' }}>
-                <span style={{ fontSize: '12px', color: '#94a3b8' }}>Mecánico de Patio</span>
-                <p style={{ fontSize: '14px', fontWeight: '700', color: '#f8fafc', marginTop: '2px' }}>
+              <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700/60">
+                <span className="text-[11px] text-slate-400">Mecánico de Patio</span>
+                <p className="text-xs sm:text-sm font-bold text-slate-100 mt-0.5">
                   {selectedOrder.assignedMechanicName || 'Sin asignar'}
                 </p>
-                <p style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>
-                  ⛽ Combustible: {selectedOrder.fuelLevel || '1/2'}
+                <p className="text-xs text-slate-400 mt-0.5">
+                  ⛽ Gasolina: {selectedOrder.fuelLevel || '1/2'}
                 </p>
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#1e293b', padding: '14px', borderRadius: '10px', marginBottom: '20px' }}>
-              <span style={{ fontSize: '12px', color: '#94a3b8' }}>Falla Reportada por Cliente:</span>
-              <p style={{ fontSize: '14px', color: '#f8fafc', marginTop: '4px', lineHeight: '1.4' }}>
+            <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700/60 mb-4">
+              <span className="text-[11px] text-slate-400">Falla Reportada:</span>
+              <p className="text-xs sm:text-sm text-slate-100 mt-1 leading-relaxed">
                 {selectedOrder.reportedIssue}
               </p>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            <div className="flex flex-col sm:flex-row justify-end gap-2">
               <button 
                 onClick={() => {
-                  const msg = `Hola ${selectedOrder.clientName}, tu moto ${selectedOrder.plate} está siendo atendida en MotoTaller Pro. Estado actual: ${selectedOrder.status}.`;
+                  const msg = `Hola ${selectedOrder.clientName}, tu moto ${selectedOrder.plate} está en servicio en MotoTaller Pro. Estado: ${selectedOrder.status}.`;
                   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
                 }}
-                style={{ 
-                  backgroundColor: '#15803d', 
-                  color: '#fff', 
-                  border: 'none', 
-                  padding: '10px 16px', 
-                  borderRadius: '8px', 
-                  fontWeight: '700', 
-                  fontSize: '13px', 
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow"
               >
-                <Send size={15} /> WhatsApp Cliente
+                <Send size={14} /> WhatsApp Cliente
               </button>
               <button 
                 onClick={() => setSelectedOrder(null)}
-                style={{ 
-                  backgroundColor: '#334155', 
-                  color: '#f8fafc', 
-                  border: 'none', 
-                  padding: '10px 18px', 
-                  borderRadius: '8px', 
-                  fontWeight: '600', 
-                  fontSize: '13px', 
-                  cursor: 'pointer' 
-                }}
+                className="bg-slate-700 hover:bg-slate-600 text-slate-100 py-2.5 px-5 rounded-xl font-semibold text-xs text-center"
               >
                 Cerrar
               </button>

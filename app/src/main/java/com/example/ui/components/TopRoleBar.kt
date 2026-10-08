@@ -110,31 +110,35 @@ fun TopRoleBar(
                             text = "PRO",
                             color = Color.White,
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Black),
-                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
                         )
                     }
                 }
                 Text(
-                    text = if (currentUser.role == UserRole.MECHANIC) "Patio de Mecánicos" else "Mostrador & Administración",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = if (currentUser.role == UserRole.MECHANIC) "Taller / Patio" else "Administración",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1
                 )
             }
         },
         actions = {
-            // Vercel / Web sync icon
+            // Vercel / Web sync icon with touch target
             IconButton(
                 onClick = onVercelClicked,
-                modifier = Modifier.testTag("top_bar_vercel_button")
+                modifier = Modifier
+                    .size(40.dp)
+                    .testTag("top_bar_vercel_button")
             ) {
                 Icon(
                     Icons.Default.CloudSync,
                     contentDescription = "Portal Web Vercel",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(22.dp)
                 )
             }
 
-            // Profile & Role Selector Chip
+            // Profile & Role Selector Chip (Compact for mobile screens)
             Box {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -142,23 +146,24 @@ fun TopRoleBar(
                         .clip(RoundedCornerShape(20.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .clickable { expanded = true }
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
                         .testTag("user_role_selector_chip")
                 ) {
                     Icon(
                         imageVector = if (currentUser.role == UserRole.MECHANIC) Icons.Default.Build else Icons.Default.AdminPanelSettings,
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(15.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Column {
                         Text(
-                            text = currentUser.name.split(" ").firstOrNull() ?: currentUser.name,
-                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                            text = currentUser.name.split(" ").firstOrNull()?.take(8) ?: "Usuario",
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            maxLines = 1
                         )
                         Text(
-                            text = currentUser.role.shortRole,
+                            text = if (currentUser.role == UserRole.MECHANIC) "Mecánico" else "Admin",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
@@ -167,7 +172,7 @@ fun TopRoleBar(
                     Icon(
                         Icons.Default.ArrowDropDown,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
 
