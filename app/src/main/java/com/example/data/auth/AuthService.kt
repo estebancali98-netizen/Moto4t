@@ -176,6 +176,19 @@ class AuthService(private val context: Context) {
     }
 
     /**
+     * Acceso directo en modo demostración para iniciar la interfaz inmediatamente
+     */
+    fun signInAsDemo(role: UserRole): AppUser {
+        val uid = "demo_user_${System.currentTimeMillis()}"
+        val name = if (role == UserRole.ADMIN) "Alejandro Administrador" else "Carlos Mecánico"
+        val email = if (role == UserRole.ADMIN) "admin@mototaller.com" else "mecanico@mototaller.com"
+        val appUser = AppUser(id = uid, name = name, role = role, email = email)
+        prefs.edit().putString("cached_user_role", role.name).apply()
+        _currentUserState.value = appUser
+        return appUser
+    }
+
+    /**
      * Consulta o inicializa el rol del usuario en Firestore (colección 'users/{uid}')
      * Diferencia claramente Administrador de Mecánico.
      */

@@ -297,6 +297,37 @@ fun AuthScreen(
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Instant Demo Access Button (Guarantees interface loads immediately without waiting for Google popups)
+                    OutlinedButton(
+                        onClick = {
+                            val user = authService.signInAsDemo(selectedRole)
+                            onAuthSuccess(user)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .testTag("demo_access_button"),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Entrar Directo al Taller (Modo Rápido)",
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(14.dp))
 
                     // Secondary info / Vercel integration link
