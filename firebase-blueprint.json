@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "1.0.0",
+  "entities": {
+    "WorkOrder": {
+      "collection": "work_orders",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "plate": { "type": "string", "required": true },
+        "motorcycleSummary": { "type": "string", "required": true },
+        "clientName": { "type": "string", "required": true },
+        "clientPhone": { "type": "string", "required": true },
+        "reportedIssue": { "type": "string", "required": true },
+        "status": { "type": "string", "required": true },
+        "assignedMechanicName": { "type": "string", "required": false },
+        "initialMileage": { "type": "number", "required": true },
+        "fuelLevel": { "type": "string", "required": false },
+        "totalApprovedQuote": { "type": "number", "required": false },
+        "advancePayment": { "type": "number", "required": false },
+        "paidAmount": { "type": "number", "required": false },
+        "balanceDue": { "type": "number", "required": false },
+        "minutesWorked": { "type": "number", "required": false },
+        "entryTimestamp": { "type": "number", "required": true },
+        "userId": { "type": "string", "required": true },
+        "updatedAt": { "type": "timestamp", "required": false }
+      }
+    },
+    "InventoryItem": {
+      "collection": "inventory",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "sku": { "type": "string", "required": true },
+        "description": { "type": "string", "required": true },
+        "brand": { "type": "string", "required": true },
+        "costPrice": { "type": "number", "required": true },
+        "salePrice": { "type": "number", "required": true },
+        "stockQuantity": { "type": "number", "required": true },
+        "minStock": { "type": "number", "required": true },
+        "warehouseLocation": { "type": "string", "required": false },
+        "supplier": { "type": "string", "required": false },
+        "crossCompatibility": { "type": "string", "required": false },
+        "userId": { "type": "string", "required": true },
+        "updatedAt": { "type": "timestamp", "required": false }
+      }
+    },
+    "Client": {
+      "collection": "clients",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "name": { "type": "string", "required": true },
+        "phone": { "type": "string", "required": true },
+        "documentNumber": { "type": "string", "required": true },
+        "address": { "type": "string", "required": false },
+        "segment": { "type": "string", "required": false },
+        "totalVisits": { "type": "number", "required": false },
+        "userId": { "type": "string", "required": true },
+        "updatedAt": { "type": "timestamp", "required": false }
+      }
+    },
+    "Motorcycle": {
+      "collection": "motorcycles",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "plate": { "type": "string", "required": true },
+        "brand": { "type": "string", "required": true },
+        "model": { "type": "string", "required": true },
+        "year": { "type": "number", "required": true },
+        "displacementCc": { "type": "number", "required": true },
+        "color": { "type": "string", "required": false },
+        "ownerClientId": { "type": "string", "required": true },
+        "currentMileage": { "type": "number", "required": true },
+        "soatExpiryDate": { "type": "string", "required": false },
+        "tecnoExpiryDate": { "type": "string", "required": false },
+        "userId": { "type": "string", "required": true },
+        "updatedAt": { "type": "timestamp", "required": false }
+      }
+    },
+    "CashEntry": {
+      "collection": "cash_entries",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "timestamp": { "type": "number", "required": true },
+        "type": { "type": "string", "required": true },
+        "category": { "type": "string", "required": true },
+        "amount": { "type": "number", "required": true },
+        "paymentMethod": { "type": "string", "required": true },
+        "relatedOrderId": { "type": "string", "required": false },
+        "description": { "type": "string", "required": true },
+        "registeredBy": { "type": "string", "required": true },
+        "userId": { "type": "string", "required": true }
+      }
+    },
+    "AuditLog": {
+      "collection": "audit_logs",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "timestamp": { "type": "number", "required": true },
+        "userName": { "type": "string", "required": true },
+        "userRole": { "type": "string", "required": true },
+        "actionDescription": { "type": "string", "required": true },
+        "entityType": { "type": "string", "required": true },
+        "entityId": { "type": "string", "required": true },
+        "userId": { "type": "string", "required": true }
+      }
+    }
+  }
+}

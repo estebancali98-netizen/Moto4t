@@ -1,0 +1,6 @@
+{
+  "name": "MotoTaller Pro",
+  "description": "Sistema integral de gestión para taller de motos con Kanban, órdenes de servicio, chequeo express, inspección visual con firma, cotizaciones, inventario y modo mecánico.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

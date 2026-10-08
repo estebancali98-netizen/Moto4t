@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Work Orders (Kanban in real time)
+    match /work_orders/{orderId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Inventory (Parts & stock in real time)
+    match /inventory/{itemId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Clients CRM
+    match /clients/{clientId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Motorcycles
+    match /motorcycles/{motoId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Cash Register Entries
+    match /cash_entries/{entryId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Audit Logs
+    match /audit_logs/{logId} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}
