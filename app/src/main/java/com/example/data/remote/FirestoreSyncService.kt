@@ -100,12 +100,17 @@ class FirestoreSyncService(private val context: Context) {
             "updatedAt" to FieldValue.serverTimestamp()
         )
 
-        db.collection("work_orders").document(order.id)
-            .set(payload, SetOptions.merge())
-            .addOnFailureListener { e ->
-                Log.e("FirestoreSync", "Error subiendo orden a Firestore", e)
-                onError(e.localizedMessage ?: "Error de sincronización")
-            }
+        try {
+            db.collection("work_orders").document(order.id)
+                .set(payload, SetOptions.merge())
+                .addOnFailureListener { e ->
+                    Log.w("FirestoreSync", "Advertencia subiendo orden a Firestore: ${e.message}")
+                    onError(e.localizedMessage ?: "Error de sincronización")
+                }
+        } catch (e: Exception) {
+            Log.w("FirestoreSync", "Excepción al preparar set() de orden: ${e.message}")
+            onError(e.localizedMessage ?: "Error de sincronización")
+        }
     }
 
     // Sync inventory item up to Firestore
@@ -132,12 +137,17 @@ class FirestoreSyncService(private val context: Context) {
             "updatedAt" to FieldValue.serverTimestamp()
         )
 
-        db.collection("inventory").document(item.id)
-            .set(payload, SetOptions.merge())
-            .addOnFailureListener { e ->
-                Log.e("FirestoreSync", "Error subiendo repuesto a Firestore", e)
-                onError(e.localizedMessage ?: "Error de sincronización")
-            }
+        try {
+            db.collection("inventory").document(item.id)
+                .set(payload, SetOptions.merge())
+                .addOnFailureListener { e ->
+                    Log.w("FirestoreSync", "Advertencia subiendo repuesto a Firestore: ${e.message}")
+                    onError(e.localizedMessage ?: "Error de sincronización")
+                }
+        } catch (e: Exception) {
+            Log.w("FirestoreSync", "Excepción al preparar set() de repuesto: ${e.message}")
+            onError(e.localizedMessage ?: "Error de sincronización")
+        }
     }
 
     // Bulk upload active orders and inventory once signed in

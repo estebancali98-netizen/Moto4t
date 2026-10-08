@@ -11,11 +11,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ui.components.TopRoleBar
+import com.example.ui.components.VercelPortalDialog
 import com.example.ui.components.WorkshopBottomNav
+import com.example.ui.screens.AuthScreen
 import com.example.ui.screens.CashRegisterScreen
 import com.example.ui.screens.CreateOrderWizardScreen
 import com.example.ui.screens.CrmClientsScreen
@@ -45,6 +50,7 @@ class MainActivity : ComponentActivity() {
 fun MotoTallerApp(
     viewModel: WorkshopViewModel = viewModel()
 ) {
+    val authenticatedUser by viewModel.authenticatedUser.collectAsStateWithLifecycle()
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
     val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
     val orders by viewModel.workOrders.collectAsStateWithLifecycle()
@@ -53,6 +59,22 @@ fun MotoTallerApp(
     val motorcycles by viewModel.motorcycles.collectAsStateWithLifecycle()
     val cashEntries by viewModel.cashEntries.collectAsStateWithLifecycle()
     val auditLogs by viewModel.auditLogs.collectAsStateWithLifecycle()
+
+    var showVercelDialog by remember { mutableStateOf(false) }
+
+    if (showVercelDialog) {
+        VercelPortalDialog(onDismissRequest = { showVercelDialog = false })
+    }
+
+    // Composable Auth Gate: Solo permite entrar a las operaciones del taller si está autenticado
+    if (authenticatedUser == null) {
+        AuthScreen(
+            authService = viewModel.authService,
+            onAuthSuccess = { /* Manejado reactivamente por authenticatedUser StateFlow */ },
+            onOpenVercelInfo = { showVercelDialog = true }
+        )
+        return
+    }
 
     val canGoBack = currentScreen is AppScreen.OrderDetail ||
             currentScreen is AppScreen.CreateOrder ||
@@ -66,10 +88,11 @@ fun MotoTallerApp(
         topBar = {
             TopRoleBar(
                 currentUser = currentUser,
-                availableUsers = viewModel.availableUsers,
-                onUserSelected = { viewModel.switchUser(it) },
+                onRoleChanged = { newRole -> viewModel.switchUserRole(newRole) },
                 canNavigateBack = canGoBack,
-                onBackClicked = { viewModel.handleBack() }
+                onBackClicked = { viewModel.handleBack() },
+                onSignOutClicked = { viewModel.signOut() },
+                onVercelClicked = { showVercelDialog = true }
             )
         },
         bottomBar = {

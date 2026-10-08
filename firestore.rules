@@ -6,6 +6,11 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Users and Roles (Admin vs Mecánico)
+    match /users/{userId} {
+      allow read, write: if isAuthenticated();
+    }
+
     // Work Orders (Kanban in real time)
     match /work_orders/{orderId} {
       allow read, write: if isAuthenticated();

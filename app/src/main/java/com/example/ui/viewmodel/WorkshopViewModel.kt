@@ -42,6 +42,7 @@ sealed class AppScreen {
 
 class WorkshopViewModel(application: Application) : AndroidViewModel(application) {
 
+    val authService = com.example.data.auth.AuthService(application)
     private val firestoreSync = com.example.data.remote.FirestoreSyncService(application)
     private val repository = WorkshopRepository(WorkshopDatabase.getDatabase(application), firestoreSync)
 
@@ -55,6 +56,7 @@ class WorkshopViewModel(application: Application) : AndroidViewModel(application
 
     private val _currentUser = MutableStateFlow(availableUsers[0])
     val currentUser: StateFlow<AppUser> = _currentUser.asStateFlow()
+    val authenticatedUser: StateFlow<AppUser?> = authService.currentUserState
 
     private val _currentScreen = MutableStateFlow<AppScreen>(AppScreen.Dashboard)
     val currentScreen: StateFlow<AppScreen> = _currentScreen.asStateFlow()
@@ -88,6 +90,36 @@ class WorkshopViewModel(application: Application) : AndroidViewModel(application
     init {
         viewModelScope.launch {
             repository.seedInitialDataIfEmpty()
+        }
+        viewModelScope.launch {
+            authService.currentUserState.collect { user ->
+                if (user != null) {
+                    _currentUser.value = user
+                    if (user.role == UserRole.MECHANIC && _currentScreen.value == AppScreen.Dashboard) {
+                        navigateTo(AppScreen.MechanicMode)
+                    }
+                }
+            }
+        }
+    }
+
+    fun switchUserRole(newRole: UserRole) {
+        val current = _currentUser.value
+        viewModelScope.launch {
+            authService.setUserRole(current.id, newRole)
+            _currentUser.value = current.copy(role = newRole)
+            if (newRole == UserRole.MECHANIC) {
+                navigateTo(AppScreen.MechanicMode)
+            } else if (_currentScreen.value == AppScreen.MechanicMode) {
+                navigateTo(AppScreen.Dashboard)
+            }
+        }
+    }
+
+    fun signOut(onComplete: () -> Unit = {}) {
+        viewModelScope.launch {
+            authService.signOut()
+            onComplete()
         }
     }
 

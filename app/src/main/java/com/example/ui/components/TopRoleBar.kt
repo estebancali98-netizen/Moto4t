@@ -14,14 +14,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.TwoWheeler
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,15 +46,17 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.model.AppUser
+import com.example.data.model.UserRole
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopRoleBar(
     currentUser: AppUser,
-    availableUsers: List<AppUser>,
-    onUserSelected: (AppUser) -> Unit,
+    onRoleChanged: (UserRole) -> Unit,
     canNavigateBack: Boolean,
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
+    onSignOutClicked: () -> Unit,
+    onVercelClicked: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -109,13 +115,25 @@ fun TopRoleBar(
                     }
                 }
                 Text(
-                    text = "Mostrador & Patio Sincronizado",
+                    text = if (currentUser.role == UserRole.MECHANIC) "Patio de Mecánicos" else "Mostrador & Administración",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         },
         actions = {
+            // Vercel / Web sync icon
+            IconButton(
+                onClick = onVercelClicked,
+                modifier = Modifier.testTag("top_bar_vercel_button")
+            ) {
+                Icon(
+                    Icons.Default.CloudSync,
+                    contentDescription = "Portal Web Vercel",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
             // Profile & Role Selector Chip
             Box {
                 Row(
@@ -128,7 +146,7 @@ fun TopRoleBar(
                         .testTag("user_role_selector_chip")
                 ) {
                     Icon(
-                        Icons.Default.Person,
+                        imageVector = if (currentUser.role == UserRole.MECHANIC) Icons.Default.Build else Icons.Default.AdminPanelSettings,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.primary
@@ -142,7 +160,8 @@ fun TopRoleBar(
                         Text(
                             text = currentUser.role.shortRole,
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                     Icon(
@@ -158,47 +177,123 @@ fun TopRoleBar(
                     modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                 ) {
                     Text(
-                        text = "Cambiar Rol de Operación:",
+                        text = "Cambiar Modo / Rol:",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
-                    availableUsers.forEach { user ->
-                        DropdownMenuItem(
-                            text = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = user.name,
-                                            style = MaterialTheme.typography.bodyMedium.copy(
-                                                fontWeight = if (user.id == currentUser.id) FontWeight.Bold else FontWeight.Normal
-                                            )
+
+                    // Option: Administrador
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    Icons.Default.AdminPanelSettings,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Administrador",
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontWeight = if (currentUser.role == UserRole.ADMIN) FontWeight.Bold else FontWeight.Normal
                                         )
-                                        Text(
-                                            text = user.role.label,
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
-                                    if (user.id == currentUser.id) {
-                                        Icon(
-                                            Icons.Default.CheckCircle,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                    }
+                                    )
+                                    Text(
+                                        text = "Mostrador, CRM y Finanzas",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 }
-                            },
-                            onClick = {
-                                onUserSelected(user)
-                                expanded = false
+                                if (currentUser.role == UserRole.ADMIN) {
+                                    Icon(
+                                        Icons.Default.CheckCircle,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
                             }
-                        )
-                    }
+                        },
+                        onClick = {
+                            onRoleChanged(UserRole.ADMIN)
+                            expanded = false
+                        }
+                    )
+
+                    // Option: Mecánico
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    Icons.Default.Build,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Mecánico de Patio",
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontWeight = if (currentUser.role == UserRole.MECHANIC) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    )
+                                    Text(
+                                        text = "Órdenes y Cronómetro Taller",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                if (currentUser.role == UserRole.MECHANIC) {
+                                    Icon(
+                                        Icons.Default.CheckCircle,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                        },
+                        onClick = {
+                            onRoleChanged(UserRole.MECHANIC)
+                            expanded = false
+                        }
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                    // Sign Out item
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ExitToApp,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(
+                                    text = "Cerrar Sesión",
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        },
+                        onClick = {
+                            expanded = false
+                            onSignOutClicked()
+                        }
+                    )
                 }
             }
             Spacer(modifier = Modifier.width(8.dp))
