@@ -1,18 +1,13 @@
-# MotoTaller PRO — Sistema Integral de Taller de Motos
+# MotoTaller PRO — Aplicación Nativa Android para Taller de Motos
 
-Arquitectura conectada en tiempo real:
-* **Móvil Android (Mecánicos & Patio):** Aplicación nativa en Jetpack Compose, modo mecánico con cronómetro de mano de obra, checklist express y firma digital.
-* **Web Recepción (Mostrador & Administración):** Aplicación React optimizada para pantallas grandes, lista para desplegar en **Vercel**.
-* **Base de Datos & Auth:** Firebase Firestore en tiempo real con autenticación Google Sign-In mediante Android Credential Manager, con distinción de roles (Administrador vs. Mecánico).
+Aplicación 100% nativa para Android desarrollada con **Kotlin** y **Jetpack Compose**, diseñada específicamente para talleres mecánicos de motocicletas.
 
----
-
-## Despliegue en Vercel (Web Recepción)
-
-El código fuente del panel de recepción web se encuentra en la carpeta `/web` con configuración `vercel.json` lista para producción.
-
-### Pasos para desplegar en Vercel:
-1. Conecta el repositorio en [Vercel](https://vercel.com).
-2. Selecciona el directorio raíz o `/web` como Root Directory.
-3. El comando de build configurado es `npm run build` y el directorio de salida es `dist`.
-4. ¡Listo! El mostrador de recepción reflejará en vivo los cambios que los mecánicos realicen desde la app móvil.
+### Módulos y Funcionalidades:
+* **Tablero Kanban en Tiempo Real:** Seguimiento ágil del ciclo de vida de cada motocicleta (*Recibidas*, *En Diagnóstico*, *Esperando Repuestos*, *En Reparación*, *Listas para Entrega*, *Entregadas*).
+* **Recepción con Wizard de 4 Pasos:** Registro rápido de cliente, motocicleta (placa, marca, kilometraje, nivel de combustible), chequeo express de 10 puntos, marcas de daños en diagrama táctil y firma digital en pantalla.
+* **Detalle de Orden & Cotizaciones:** Aprobación interactiva de repuestos, cálculo de mano de obra y generación de mensajes directos para **WhatsApp**.
+* **Modo Mecánico de Patio:** Cronómetro de trabajo en tiempo real, registro de tiempos trabajados y fotos/notas de piezas dañadas.
+* **Control de Inventario y Bodega:** Catálogo de repuestos con ubicación en estantería, niveles de stock mínimo y alertas automáticas de reposición.
+* **CRM de Clientes & Motos:** Historial de visitas por cliente y alertas de vencimiento de SOAT y Tecnomecánica.
+* **Caja Registradora & Auditoría:** Registro de anticipos, liquidación de saldos en efectivo/transferencia y bitácora de auditoría.
+* **Base de Datos & Seguridad:** Persistencia local con **Room Database (SQLite)** y sincronización en la nube con **Firebase Firestore** y autenticación Google vía Jetpack Credential Manager.

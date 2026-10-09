@@ -66,8 +66,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AuthScreen(
     authService: AuthService,
-    onAuthSuccess: (AppUser) -> Unit,
-    onOpenVercelInfo: () -> Unit = {}
+    onAuthSuccess: (AppUser) -> Unit
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -328,28 +327,6 @@ fun AuthScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    // Secondary info / Vercel integration link
-                    OutlinedButton(
-                        onClick = onOpenVercelInfo,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(44.dp)
-                            .testTag("btn_vercel_info"),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.CloudSync,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Portal Web & Vercel Sync",
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
                 }
             }
 
@@ -368,7 +345,7 @@ fun AuthScreen(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "Firebase Firestore • Google Identity • Vercel Web Ready",
+                    text = "Firebase Firestore • Google Identity • 100% Nativo Android",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

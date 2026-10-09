@@ -55,8 +55,7 @@ fun TopRoleBar(
     onRoleChanged: (UserRole) -> Unit,
     canNavigateBack: Boolean,
     onBackClicked: () -> Unit,
-    onSignOutClicked: () -> Unit,
-    onVercelClicked: () -> Unit
+    onSignOutClicked: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -123,21 +122,6 @@ fun TopRoleBar(
             }
         },
         actions = {
-            // Vercel / Web sync icon with touch target
-            IconButton(
-                onClick = onVercelClicked,
-                modifier = Modifier
-                    .size(40.dp)
-                    .testTag("top_bar_vercel_button")
-            ) {
-                Icon(
-                    Icons.Default.CloudSync,
-                    contentDescription = "Portal Web Vercel",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-
             // Profile & Role Selector Chip (Compact for mobile screens)
             Box {
                 Row(

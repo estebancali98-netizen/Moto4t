@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ui.components.TopRoleBar
-import com.example.ui.components.VercelPortalDialog
 import com.example.ui.components.WorkshopBottomNav
 import com.example.ui.screens.AuthScreen
 import com.example.ui.screens.CashRegisterScreen
@@ -60,18 +59,11 @@ fun MotoTallerApp(
     val cashEntries by viewModel.cashEntries.collectAsStateWithLifecycle()
     val auditLogs by viewModel.auditLogs.collectAsStateWithLifecycle()
 
-    var showVercelDialog by remember { mutableStateOf(false) }
-
-    if (showVercelDialog) {
-        VercelPortalDialog(onDismissRequest = { showVercelDialog = false })
-    }
-
     // Composable Auth Gate: Solo permite entrar a las operaciones del taller si está autenticado
     if (authenticatedUser == null) {
         AuthScreen(
             authService = viewModel.authService,
-            onAuthSuccess = { /* Manejado reactivamente por authenticatedUser StateFlow */ },
-            onOpenVercelInfo = { showVercelDialog = true }
+            onAuthSuccess = { /* Manejado reactivamente por authenticatedUser StateFlow */ }
         )
         return
     }
@@ -91,8 +83,7 @@ fun MotoTallerApp(
                 onRoleChanged = { newRole -> viewModel.switchUserRole(newRole) },
                 canNavigateBack = canGoBack,
                 onBackClicked = { viewModel.handleBack() },
-                onSignOutClicked = { viewModel.signOut() },
-                onVercelClicked = { showVercelDialog = true }
+                onSignOutClicked = { viewModel.signOut() }
             )
         },
         bottomBar = {
